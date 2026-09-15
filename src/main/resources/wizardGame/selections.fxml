@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wizardGame.Controller">
+   <children>
+      <Label layoutX="31.0" layoutY="24.0" text="Number Of Players" />
+      <RadioButton fx:id="threePlayers" layoutX="31.0" layoutY="50.0" mnemonicParsing="false" onAction="#showThreePlayers" text="3">
+         <toggleGroup>
+            <ToggleGroup fx:id="numberOfPlayers" />
+         </toggleGroup>
+      </RadioButton>
+      <RadioButton fx:id="fourPlayers" layoutX="31.0" layoutY="75.0" mnemonicParsing="false" onAction="#showFourPlayers" selected="true" text="4" toggleGroup="$numberOfPlayers" />
+      <RadioButton fx:id="fivePlayers" layoutX="31.0" layoutY="101.0" mnemonicParsing="false" onAction="#showFivePlayers" text="5" toggleGroup="$numberOfPlayers" />
+      <RadioButton fx:id="sixPlayers" layoutX="31.0" layoutY="131.0" mnemonicParsing="false" onAction="#showSixPlayers" text="6" toggleGroup="$numberOfPlayers" />
+      <Button fx:id="newGameButton" layoutX="117.0" layoutY="89.0" mnemonicParsing="false" onAction="#startNewGame" text="Start Game" />
+      <TextField fx:id="player1Name" layoutX="388.0" layoutY="55.0" />
+      <Label fx:id="player1Label" layoutX="308.0" layoutY="59.0" text="Your Name" />
+      <TextField fx:id="player2Name" layoutX="388.0" layoutY="89.0" />
+      <Label fx:id="player2Label" layoutX="308.0" layoutY="93.0" text="Player 2 Name" />
+      <TextField fx:id="player3Name" layoutX="388.0" layoutY="127.0" />
+      <Label fx:id="player3Label" layoutX="308.0" layoutY="131.0" text="Player 3 Name" />
+      <TextField fx:id="player4Name" layoutX="388.0" layoutY="168.0" />
+      <Label fx:id="player4NameLabel" layoutX="308.0" layoutY="172.0" text="Player 4 Name" />
+      <TextField fx:id="player5Name" layoutX="388.0" layoutY="207.0" visible="false" />
+      <Label fx:id="player5NameLabel" layoutX="308.0" layoutY="211.0" text="Player 5 Name" visible="false" />
+      <TextField fx:id="player6Name" layoutX="388.0" layoutY="249.0" visible="false" />
+      <Label fx:id="player6NameLabel" layoutX="308.0" layoutY="253.0" text="Player 6 Name" visible="false" />
+      <Button fx:id="randomizeCPUNamesButton" layoutX="392.0" layoutY="340.0" mnemonicParsing="false" onAction="#randomizeCPUNames" text="Randomize CPU Names" />
+   </children>
+</AnchorPane>

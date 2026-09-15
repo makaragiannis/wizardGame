@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+
+<ScrollPane fx:id="playedCardsPane" fitToHeight="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="199.0" prefWidth="600.0" vbarPolicy="NEVER" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/26" fx:controller="wizardGame.PlayedCardsController">
+   <content>
+      <HBox id="playedCardsBox" fx:id="playedCardsBox" alignment="TOP_CENTER" prefHeight="179.0" prefWidth="581.0" spacing="10.0" />
+   </content>
+</ScrollPane>

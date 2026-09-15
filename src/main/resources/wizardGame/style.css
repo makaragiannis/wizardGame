@@ -1,0 +1,34 @@
+#centerCards {
+    -fx-border-color: #FF0000;
+    -fx-border-width: 4px;
+    -fx-border-radius: 15px;
+    -fx-background-color: #7F7F7F;
+    -fx-background-radius: 15px;
+    -fx-padding: 15px;
+    -fx-min-width: 100px;
+    -fx-min-height: 125px;
+}
+
+#trumpCardBox {
+    -fx-border-color: #FF0000;
+    -fx-border-width: 4px;
+    -fx-border-radius: 15px;
+    -fx-background-color: #7F7F7F;
+    -fx-background-radius: 15px;
+    -fx-padding: 15px;
+    -fx-min-width: 25px;
+    -fx-min-height: 80px;
+}
+
+.playerInfoStyle {
+    -fx-border-color: #8B4513;       /* Frame border color */
+    -fx-border-width: 2px;
+    -fx-border-radius: 8px;          /* Rounded border corners */
+    
+    -fx-background-color: #F8F4E6;   /* Slight parchment/paper color */
+    -fx-background-radius: 8px;      /* Matches border radius */
+    
+    -fx-padding: 10px;               /* Space inside the frame */
+    -fx-spacing: 5px;                /* Space between Name and Score */
+    
+}

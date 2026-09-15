@@ -1,0 +1,10 @@
+#centerCards {
+    -fx-border-color: #8B4513;
+    -fx-border-width: 4;
+    -fx-border-radius: 15;
+    -fx-background-color: #2E8B57;
+    -fx-background-radius: 15;
+    -fx-padding: 15;
+    -fx-min-width: 200;
+    -fx-min-height: 180;
+}
