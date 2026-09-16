@@ -38,7 +38,9 @@ public class Gameplay {
 		players = new Player[playerNum];
 		table = new Table();
 		
-		maxRound = cardNum / playerNum;
+//		maxRound = cardNum / playerNum;
+		
+		maxRound = 3;
 		round = maxRound - 1;
 //		round = 0;
 		
@@ -360,6 +362,24 @@ public class Gameplay {
 	
 	public void updateLeadColor() {
 		
+	}
+	
+	public Player getWinner() {
+		
+		// scan players until we find the one with the highest score //
+		
+		// initialize with player 0 as winner //
+		Player currentWinner = players[0];
+		int currentHighScore = players[0].getScore();
+		
+		for (Player player : players) {
+			if (player.getScore() > currentHighScore) {
+				currentWinner = player;
+				currentHighScore = player.getScore();
+			}
+		}
+		
+		return currentWinner;
 	}
 	
 	void printScores() {

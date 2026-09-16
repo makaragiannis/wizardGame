@@ -4,3 +4,4 @@ bin/
 .classpath
 .settings/
 commit_msg.txt
+dependency-reduced-pom.xml

@@ -82,7 +82,7 @@ public class GameController implements Initializable {
 //		startRound(10);
 	}
 	
-	public void nextAction(ActionEvent e) {
+	public void nextAction(ActionEvent e) throws IOException {
 //		System.out.println("Next Action");
 		
 		switch(actionIndex) {
@@ -231,9 +231,20 @@ public class GameController implements Initializable {
 				
 				showPlayerInfoTop();
 				
-				actionIndex = 0;
-				nextActionButton.setText("Start Round " + (gameplay.getCurrentRound() + 1));
+				if (gameplay.getCurrentRound() == gameplay.getMaxRound()) {
+					nextActionButton.setText("Congratulate Winner");
+					actionIndex = 8;
+				}
+				else {	
+					actionIndex = 0;
+					nextActionButton.setText("Start Round " + (gameplay.getCurrentRound() + 1));
+				}
 				
+				break;
+			}
+			
+			case 8: {
+				congratulateWinner(e);
 				break;
 			}
 		
@@ -302,6 +313,23 @@ public class GameController implements Initializable {
 		playedCardsController.addCardsNewWindow(playedCards);
 		
 		Stage stage = new Stage(); // opens a completely new window
+		
+		Scene scene = new Scene(root);
+		
+		stage.setScene(scene);
+		stage.show();
+		
+	}
+	
+	public void congratulateWinner(ActionEvent e) throws IOException {
+				
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("winner.fxml"));
+		Parent root = loader.load();
+		
+		WinnerController winnerController = loader.getController();
+		winnerController.updateWinner(gameplay.getWinner().getName());
+		
+		Stage stage = (Stage) ((Node) e.getSource()).getScene().getWindow();
 		
 		Scene scene = new Scene(root);
 		
