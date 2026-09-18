@@ -38,11 +38,11 @@ public class Gameplay {
 		players = new Player[playerNum];
 		table = new Table();
 		
-//		maxRound = cardNum / playerNum;
+		maxRound = cardNum / playerNum;
 		
-		maxRound = 3;
-		round = maxRound - 1;
-//		round = 0;
+//		maxRound = 3;
+//		round = maxRound - 1;
+		round = 0;
 		
 		generateCards();
 		initPlayers(playerName, CPUNames);

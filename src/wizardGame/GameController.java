@@ -83,7 +83,8 @@ public class GameController implements Initializable {
 	}
 	
 	public void nextAction(ActionEvent e) throws IOException {
-//		System.out.println("Next Action");
+		
+//		System.out.println("Current State: " + actionIndex);
 		
 		switch(actionIndex) {
 		
@@ -141,6 +142,7 @@ public class GameController implements Initializable {
 					actionIndex = 4;
 					gameplay.initNewTrick();
 					nextActionButton.setText("Play Cards: " + currentPlayer.getName());
+					refreshHand(); // do this to change drag n drop functionality //
 				}
 				else if (currentPlayer.isUser()) {
 					tricksChoiceBox.setVisible(true);
@@ -154,7 +156,7 @@ public class GameController implements Initializable {
 			case 4: {
 				
 				currentTrickWinnerLabel.setText("Current Trick Winner: ");
-						
+				
 				playCard(currentPlayer);
 				
 				if (currentPlayer.isUser() && !userPlayedCard) break;
@@ -172,6 +174,8 @@ public class GameController implements Initializable {
 					actionIndex = 5;
 					nextActionButton.setText("Evaluate Trick");
 				}
+				
+				refreshHand(); // do this to change drag n drop functionality //
 				
 				
 				break;
@@ -214,6 +218,7 @@ public class GameController implements Initializable {
 				showPlayerInfoTop();
 				
 				actionIndex = 4;
+				refreshHand(); // do this to change drag n drop functionality //
 				
 				resetVisualTrickInfo();
 				nextActionButton.setText("Play Cards: " + currentPlayer.getName());
@@ -317,7 +322,6 @@ public class GameController implements Initializable {
 		Scene scene = new Scene(root);
 		
 		stage.setScene(scene);
-		stage.show();
 		
 	}
 	
@@ -394,28 +398,6 @@ public class GameController implements Initializable {
 		
 		System.out.printf("%s guessed %d tricks.\n", player.getName(), player.getTricksGuessed());
 		return player.getTricksGuessed();
-	}
-	
-	public void startRound(int round) {
-		
-//		changeRound(round);
-		
-		gameplay.shuffleCards();
-		
-//		gameplay.printCards();
-		
-//		gameplay.dealCards(playersNum, round);
-		
-		ArrayList<Card> playerHandCards = gameplay.getPlayerHandCards(false); // do not order //
-		
-		gameplay.printPlayerHandCards();
-		
-		showHand(playerHandCards);
-		
-		showPlayerInfoTop();
-		
-		tricksChoiceBox.getItems().addAll(getAvailableTrickGuesses(round));
-		
 	}
 	
 	public void orderHand() {
@@ -498,22 +480,22 @@ public class GameController implements Initializable {
 	        	cardImageView.setScaleY(1);
 	        });
 	        
-	        cardImageView.setOnDragDetected(event -> {
-	        	
-	        	Dragboard db = cardImageView.startDragAndDrop(TransferMode.MOVE); // or none? //
-	        	ClipboardContent content = new ClipboardContent();
-	        	content.putString("Moving Card");
-	        	db.setContent(content);
-	        	
-	        	db.setDragView(cardImageView.snapshot(null, null));
-	        	
-	        	System.out.println("Moving Card");
-	        	
-	        	setDraggedCard(card);
-	        	
-	        	event.consume();
-	        	
-	        });
+	        if (currentPlayer == gameplay.getUser() && actionIndex == 4) {
+		        cardImageView.setOnDragDetected(event -> {
+		        	
+		        	Dragboard db = cardImageView.startDragAndDrop(TransferMode.MOVE); // or none? //
+		        	ClipboardContent content = new ClipboardContent();
+		        	content.putString("Moving Card");
+		        	db.setContent(content);
+		        	
+		        	db.setDragView(cardImageView.snapshot(null, null));
+		        			        	
+		        	setDraggedCard(card);
+		        	
+		        	event.consume();
+		        	
+		        });
+	        }
 	        
 
 			
