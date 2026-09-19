@@ -4,41 +4,41 @@ public class Card {
 
 	CardColor color;
 	Value value;
-	
+
 	public Card(CardColor color, Value value) {
 		this.color = color;
 		this.value = value;
 	}
-	
+
 	public boolean isCardW() {
 		return (value.getValue() == "W");
 	}
-	
+
 	public boolean isCardJ() {
 		return (value.getValue() == "J");
 	}
 
-	
+
 	public int getCardNumber() {
-		
+
 		return value.getNumber();
 	}
-	
+
 	public String getColorString() {
-		
+
 		return color.getColor();
 	}
-	
+
 	public CardColor getCardColor() {
-		
+
 		return color;
 	}
-	
+
 	public String getCardValue() {
-		
+
 		return value.getValue();
 	}
-	
+
 	public void printCard() {
 		if (getCardNumber() == -1) {
 			System.out.println(getCardValue());
@@ -47,16 +47,20 @@ public class Card {
 			System.out.println(getCardColor() + " " + getCardValue());
 		}
 	}
-	
+
 	public String getImagePath() {
-		
-		if (value == Value.W) return "Cards/w.png";
-		if (value == Value.J) return "Cards/z.png";
+
+		if (value == Value.W) {
+      return "Cards/w.png";
+    }
+		if (value == Value.J) {
+      return "Cards/z.png";
+    }
 		return "Cards/" + color.getColor() + "/" + color.getColor().toLowerCase() + value.getValue() + ".png";
 	}
-	
+
 	public int getCardScore(CardColor trumpColor, CardColor leadColor) {
-		
+
 		// Scores start from 0 and end at 27 //
 		// 0 corresponds to J //
 		// 1 to 13 correspond to the value of cards of the lead color //
@@ -64,26 +68,54 @@ public class Card {
 		// 27 corresponds to W //
 		// anything else corresponds to -1 //
 		// the winning card is the card with the highest score //
-		
+
 		if (value == Value.J) {
 			return 0;
 		}
-		
+
 		if (value == Value.W) {
 			return 27;
 		}
-		
+
 		if (color == leadColor) {
 			return value.getNumber(); // (1 - 13) //
 		}
-		
+
 		if (color == trumpColor) {
 			return 13 + value.getNumber(); // (14 - 26) //
 		}
-		
+
 		return -1;
-			
-			
+
+
 	}
-	
+
+	// variation of setInvalidIndices in Player class //
+	public boolean isCardPlayable(CardColor leadColor, boolean playableCardExists) {
+
+    // if no lead color exists, this means that the card played now sets the lead color //
+    // so no restrictions //
+
+    // if the lead color is colorless, there also no restrictions //
+	  if (leadColor == null || leadColor == CardColor.Colorless || color == CardColor.Colorless) {
+	    return true;
+	  }
+
+	   // if the lead card has a color (is not W or J) //
+    // then all players MUST play a card of that color (if they have it) //
+    // they can also (optionally) play W or J //
+
+	  if (leadColor != color) {
+	    if (playableCardExists) {
+	      return false;
+	    }
+	    else {
+        return true;
+	    }
+    }
+
+	  return true;
+
+	}
+
 }

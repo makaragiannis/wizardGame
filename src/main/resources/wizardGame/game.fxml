@@ -15,7 +15,7 @@
       <HBox fx:id="player6Box" layoutX="450.0" layoutY="354.0" prefHeight="50.0" prefWidth="150.0" />
       <Label fx:id="roundLabel" layoutX="229.0" layoutY="170.0" text="Round 1" />
       <HBox id="centerCards" fx:id="centerCards" alignment="CENTER" layoutX="172.0" layoutY="250.0" onDragDropped="#dropCardAtCenter" onDragOver="#dragCardOverCenter" prefHeight="125.0" prefWidth="397.0" spacing="5.0" />
-      <Button fx:id="orderCardsButton" layoutX="459.0" layoutY="462.0" mnemonicParsing="false" onAction="#orderHand" text="Order Cards" />
+      <Button fx:id="orderCardsButton" layoutX="450.0" layoutY="462.0" mnemonicParsing="false" onAction="#orderHand" prefHeight="25.0" prefWidth="117.0" text="Order Cards" />
       <ChoiceBox fx:id="tricksChoiceBox" layoutX="345.0" layoutY="462.0" prefHeight="25.0" prefWidth="51.0" visible="false" />
       <Button fx:id="nextActionButton" layoutX="163.0" layoutY="462.0" mnemonicParsing="false" onAction="#nextAction" text="Next Action" />
       <HBox fx:id="trumpCardBox" layoutX="55.0" layoutY="250.0" prefHeight="100.0" prefWidth="80.0" />
@@ -25,5 +25,6 @@
       <Label fx:id="nowPlayingLabel" layoutX="309.0" layoutY="187.0" text="Now Playing:" />
       <Label fx:id="currentTrickWinnerLabel" layoutX="68.0" layoutY="379.0" text="Current Trick Winner:" />
       <Button fx:id="showPlayedCardsButton" layoutX="24.0" layoutY="462.0" mnemonicParsing="false" onAction="#showPlayedCards" text="Show Played Cards" />
+      <Button fx:id="showInvalidCardsButton" layoutX="450.0" layoutY="427.0" mnemonicParsing="false" onAction="#showInvalidCards" text="Show Invalid Cards" />
    </children>
 </AnchorPane>
