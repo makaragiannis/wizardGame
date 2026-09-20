@@ -59,6 +59,7 @@ public class GameController implements Initializable {
 
 	private Boolean nullValueChosen = false;
 	private Boolean userPlayedCard = false;
+	private boolean invalidCardsShown = false;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -117,13 +118,21 @@ public class GameController implements Initializable {
 				actionIndex = 3;
 				if (gameplay.getCurrentRound() != gameplay.getMaxRound()) {
           setTrumpCard();
+          if (gameplay.getDealer().isUser() && gameplay.getTrumpCard().getCardValue() == "W") {
+            // next state is now to choose trump color //
+            nextActionButton.setText("Set Trump Color");
+            actionIndex = 9;
+            break;
+          }
         }
+
 				currentPlayer = gameplay.getRoundFirstPlayer();
 				nextActionButton.setText("Guess Tricks: " + currentPlayer.getName());
 				if (currentPlayer.isUser()) {
 					tricksChoiceBox.setVisible(true);
 					tricksChoiceBox.getItems().addAll(getAvailableTrickGuesses(gameplay.getCurrentRound()));
 				}
+
 				break;
 			}
 
@@ -257,6 +266,21 @@ public class GameController implements Initializable {
 			case 8: {
 				congratulateWinner(e);
 				break;
+			}
+
+			case 9: {
+			  showTrumpColorPanel();
+
+			  currentPlayer = gameplay.getRoundFirstPlayer();
+        nextActionButton.setText("Guess Tricks: " + currentPlayer.getName());
+        if (currentPlayer.isUser()) {
+          tricksChoiceBox.setVisible(true);
+          tricksChoiceBox.getItems().addAll(getAvailableTrickGuesses(gameplay.getCurrentRound()));
+        }
+
+        actionIndex = 3;
+
+        break;
 			}
 
 		}
@@ -484,7 +508,7 @@ public class GameController implements Initializable {
 
 //      // if card is not playable, grey it out //
 //      // keep the code to insert a button for it //
-//      if (card.isCardPlayable(gameplay.getLeadColor(), playableCardExists)) {
+//      if (invalidCardsShown && card.isCardPlayable(gameplay.getLeadColor(), playableCardExists)) {
 //        ColorAdjust colorAdjustGrayscale = new ColorAdjust();
 //        colorAdjustGrayscale.setSaturation(-1);
 //        cardImageView.setEffect(colorAdjustGrayscale);
@@ -536,7 +560,14 @@ public class GameController implements Initializable {
 
 	public void showInvalidCards() {
 
+	  if (invalidCardsShown == true) {
+	    invalidCardsShown = false;
+	  }
+	  else {
+	    invalidCardsShown = true;
+	  }
 
+	  refreshHand();
 	}
 
 	public void setDraggedCard(Card card) {
@@ -605,11 +636,26 @@ public class GameController implements Initializable {
 		if (trumpCard.getCardValue() == "W") {
 			trumpColorLabel.setText("Trump Color\n(Chosen by " + gameplay.getDealer().getName() + ")");
 			trumpColorLabel.setTextAlignment(TextAlignment.CENTER);
-			trumpColorLabel.setTextFill(chooseTrumpColor());
+
+			color = chooseTrumpColor();
+			cardColor = colorToCardColor(color);
+
+	     if (color != null) {
+        trumpColorLabel.setTextFill(color);
+       }
 		}
 		else if (trumpCard.getCardValue() == "J") {
 			// if card is J, there is no trump color //
+//      trumpColorLabel.setText("Trump Color: None");
+//      trumpColorLabel.setTextAlignment(TextAlignment.CENTER);
 			trumpColorLabel.setText("No Trump Color");
+		}
+
+		if (cardColor != null) {
+		  System.out.println("Trump Color chosen: " + cardColor.getColor());
+		}
+		else {
+		  System.out.println("Trump Color not yet chosen!");
 		}
 
 		gameplay.setTrumpColor(cardColor);
@@ -620,12 +666,41 @@ public class GameController implements Initializable {
 
 		if (gameplay.getDealer().isUser()) {
 			// for now just return red //
-			return Color.RED;
+//			return Color.RED;
+//			return cardColorToColor()
+
+			return null; // will choose at the next step //
 		}
 		else {
 			return cardColorToColor(gameplay.AIChooseTrumpColor());
 		}
 
+	}
+
+	public void showTrumpColorPanel() throws IOException {
+    FXMLLoader loader = new FXMLLoader(getClass().getResource("chooseTrumpColor.fxml"));
+    Parent root = loader.load();
+
+    TrumpColorController trumpColorController = loader.getController();
+//    playedCardsController.addCardsNewWindow(playedCards);
+
+    Stage stage = new Stage(); // opens a completely new window
+
+    Scene scene = new Scene(root);
+
+    stage.setScene(scene);
+
+    stage.showAndWait();
+
+    CardColor trumpColor = trumpColorController.getTrumpColor();
+
+    System.out.println("Trump Color set to " + trumpColor.getColor());
+
+    trumpColorLabel.setText("Trump Color\n(Chosen by " + gameplay.getDealer().getName() + ")");
+    trumpColorLabel.setTextAlignment(TextAlignment.CENTER);
+    trumpColorLabel.setTextFill(cardColorToColor(trumpColor));
+
+    gameplay.setTrumpColor(trumpColor);
 	}
 
 	public Color cardColorToColor(CardColor color) {
@@ -637,6 +712,23 @@ public class GameController implements Initializable {
 			default: return null;
 		}
 	}
+
+	 public CardColor colorToCardColor(Color color) {
+
+	   if (color == Color.RED) {
+      return CardColor.Red;
+     } else if (color == Color.YELLOW) {
+      return CardColor.Yellow;
+     } else if (color == Color.BLUE) {
+      return CardColor.Blue;
+     } else if (color == Color.GREEN) {
+      return CardColor.Green;
+     }
+     else {
+       return null;
+     }
+
+	  }
 
 
 	public ArrayList<Integer> getAvailableTrickGuesses(int cardNum) {

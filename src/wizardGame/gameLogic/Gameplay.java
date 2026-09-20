@@ -40,7 +40,7 @@ public class Gameplay {
 
 		maxRound = cardNum / playerNum;
 
-		maxRound = 3;
+//		maxRound = 3;
 //		round = maxRound - 1;
 		round = 0;
 
@@ -271,6 +271,7 @@ public class Gameplay {
 
 	public void setTrumpCard() {
 		table.setTrumpCard(getNextCard());
+//	  table.setTrumpCard(new Card(CardColor.Colorless, Value.W));
 	}
 
 	public Card getTrumpCard() {
