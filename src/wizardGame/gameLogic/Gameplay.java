@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 import wizardGame.Trick.Trick;
+import wizardGame.gameLogic.assumption.Assumption;
 import wizardGame.gameLogic.card.Card;
 import wizardGame.gameLogic.card.CardColor;
 import wizardGame.gameLogic.card.Value;
@@ -294,6 +295,8 @@ public class Gameplay {
 		player.playCard(table, card);
 
 		table.addPlayedCard(card);
+
+		checkAssumption(card.getCardColor(), table.getLeadColor() , player);
 	}
 
 	public void resetTrick() {
@@ -306,6 +309,10 @@ public class Gameplay {
 
 	public ArrayList<Card> getPlayedCards() {
 		return table.getPlayedCards();
+	}
+
+	public ArrayList<Assumption> getAssumptions() {
+	  return table.getAssumptions();
 	}
 
 
@@ -426,6 +433,18 @@ public class Gameplay {
 	public void selectAndPlayCard(Player player) {
 		Card playedCard = player.selectCardToPlay(table, null);
 		player.playCard(table, playedCard);
+	}
+
+	// check if an assumption can be made out of a play, and add it if so //
+	public void checkAssumption(CardColor playedCardColor, CardColor leadColor, Player player) {
+
+	  if (playedCardColor == CardColor.Colorless || leadColor == CardColor.Colorless || leadColor == null) {
+	    return; // no assumption can be made //
+	  }
+
+	  if (playedCardColor != leadColor) {
+	    table.addAssumption(new Assumption(player, leadColor));
+	  }
 	}
 
 	int[] getTricksGuessed() {

@@ -25,6 +25,6 @@
       <Label fx:id="nowPlayingLabel" layoutX="309.0" layoutY="187.0" text="Now Playing:" />
       <Label fx:id="currentTrickWinnerLabel" layoutX="68.0" layoutY="379.0" text="Current Trick Winner:" />
       <Button fx:id="showPlayedCardsButton" layoutX="24.0" layoutY="462.0" mnemonicParsing="false" onAction="#showPlayedCards" text="Show Played Cards" />
-      <Button fx:id="showInvalidCardsButton" layoutX="450.0" layoutY="427.0" mnemonicParsing="false" onAction="#showInvalidCards" text="Show Invalid Cards" />
+      <Button fx:id="showAssumptionsButton" layoutX="450.0" layoutY="427.0" mnemonicParsing="false" onAction="#showAssumptions" text="Show Assumptions" />
    </children>
 </AnchorPane>

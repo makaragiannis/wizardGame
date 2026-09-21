@@ -43,7 +43,7 @@ public class GameController implements Initializable {
 	private Label roundLabel, trumpColorLabel, leadColorLabel, dealerLabel, nowPlayingLabel, currentTrickWinnerLabel;
 
 	@FXML
-	private Button orderCardsButton, nextActionButton, showPlayedCardsButton, showInvalidCardsButton;
+	private Button orderCardsButton, nextActionButton, showPlayedCardsButton, showAssumptionsButton;
 
 	@FXML
 	private ChoiceBox<Integer> tricksChoiceBox;
@@ -59,7 +59,6 @@ public class GameController implements Initializable {
 
 	private Boolean nullValueChosen = false;
 	private Boolean userPlayedCard = false;
-	private boolean invalidCardsShown = false;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -359,6 +358,32 @@ public class GameController implements Initializable {
 
 	}
 
+	 public void showAssumptions(ActionEvent e) throws IOException {
+
+	    ArrayList<Card> playedCards = gameplay.getPlayedCards();
+	    playedCards.sort(
+	            Comparator.comparing(Card::getCardColor)
+	                .thenComparing(Card::getCardNumber)
+	        );
+
+	    System.out.println("Num of played card is " + playedCards.size());
+
+	    FXMLLoader loader = new FXMLLoader(getClass().getResource("assumptions.fxml"));
+	    Parent root = loader.load();
+
+	    AssumptionsController assumptionsController = loader.getController();
+	    assumptionsController.addAssumptions(gameplay.getAssumptions());
+
+	    Stage stage = new Stage(); // opens a completely new window
+
+	    Scene scene = new Scene(root);
+
+	    stage.setScene(scene);
+
+	    stage.show();
+
+	  }
+
 	public void congratulateWinner(ActionEvent e) throws IOException {
 
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("winner.fxml"));
@@ -556,18 +581,6 @@ public class GameController implements Initializable {
 			player1Box.getChildren().add(cardImageView);
 
 		}
-	}
-
-	public void showInvalidCards() {
-
-	  if (invalidCardsShown == true) {
-	    invalidCardsShown = false;
-	  }
-	  else {
-	    invalidCardsShown = true;
-	  }
-
-	  refreshHand();
 	}
 
 	public void setDraggedCard(Card card) {
