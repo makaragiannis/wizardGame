@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="278.0" prefWidth="385.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wizardGame.TrumpColorController">
+   <children>
+      <RadioButton fx:id="redButton" layoutX="66.0" layoutY="130.0" mnemonicParsing="false" selected="true" text="Red">
+         <toggleGroup>
+            <ToggleGroup fx:id="trumpColorGroup" />
+         </toggleGroup>
+      </RadioButton>
+      <RadioButton fx:id="blueButton" layoutX="66.0" layoutY="191.0" mnemonicParsing="false" text="Blue" toggleGroup="$trumpColorGroup" />
+      <RadioButton fx:id="greenButton" layoutX="151.0" layoutY="191.0" mnemonicParsing="false" text="Green" toggleGroup="$trumpColorGroup" />
+      <RadioButton fx:id="yellowButton" layoutX="151.0" layoutY="130.0" mnemonicParsing="false" text="Yellow" toggleGroup="$trumpColorGroup" />
+      <Button fx:id="setTrumpColorButton" layoutX="252.0" layoutY="158.0" mnemonicParsing="false" onAction="#setTrumpColor" text="Set Color" />
+      <Label layoutX="132.0" layoutY="69.0" text="Choose Trump Color" />
+   </children>
+</AnchorPane>
