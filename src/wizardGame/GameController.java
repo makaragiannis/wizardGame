@@ -24,9 +24,13 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import wizardGame.gameLogic.Gameplay;
@@ -40,7 +44,10 @@ public class GameController implements Initializable {
 	int playersNum;
 
 	@FXML
-	private Label roundLabel, trumpColorLabel, leadColorLabel, dealerLabel, nowPlayingLabel, currentTrickWinnerLabel;
+	private BorderPane myBorderPane;
+
+	@FXML
+	private Label lastActionLabel, lastTrickWinnerLabel, roundLabel, trumpColorLabel, leadColorLabel, dealerLabel, firstPlayerLabel, currentTrickWinnerLabel;
 
 	@FXML
 	private Button orderCardsButton, nextActionButton, showPlayedCardsButton, showAssumptionsButton;
@@ -59,12 +66,29 @@ public class GameController implements Initializable {
 
 	private Boolean nullValueChosen = false;
 	private Boolean userPlayedCard = false;
+	private Boolean boldRoundScores = false;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		// TODO Auto-generated method stub
 
 //		tricksChoiceBox.getItems().addAll(getAvailableTrickGuesses(1));
+
+	  // calculate spacing when window is resized //
+	  player1Box.widthProperty().addListener((obs, oldVal, newVal) -> {
+
+	    calculateCardSpacing();
+	  });
+
+	   myBorderPane.heightProperty().addListener((obs, oldVal, newVal) -> {
+
+	      System.out.println("Old - New:" + oldVal.doubleValue() + " " + newVal.doubleValue() );
+	    });
+
+   topPlayerInfoBox.setHgrow(topPlayerInfoBox, Priority.ALWAYS);
+
+   currentTrickWinnerLabel.setText(null);
+   lastTrickWinnerLabel.setText(null);
 
 	}
 
@@ -92,12 +116,17 @@ public class GameController implements Initializable {
 				actionIndex = 1;
 				increaseRound();
 
+        lastActionLabel.setText("Round " + gameplay.getCurrentRound() + " starts!");
+
 				resetVisualTrumpCardInfo();
 				resetVisualTrickInfo();
 
+        boldRoundScores = false;
+        showPlayerInfoTop();
+
 				gameplay.shuffleCards();
 				dealerLabel.setText("Dealer: " + gameplay.getDealer().getName());
-				nowPlayingLabel.setText("First Player: " + gameplay.getRoundFirstPlayer().getName());
+				firstPlayerLabel.setText("First Player: " + gameplay.getRoundFirstPlayer().getName());
 				nextActionButton.setText("Deal Cards");
 				break;
 			}
@@ -105,28 +134,38 @@ public class GameController implements Initializable {
 			case 1: {
 				actionIndex = 2;
 				gameplay.dealCards();
-				ArrayList<Card> playerHandCards = gameplay.getPlayerHandCards(false); // do not order //
-				showHand(playerHandCards);
-				showPlayerInfoTop();
+
+				lastActionLabel.setText("Everyone was dealt " + gameplay.getCurrentRound() + " cards!");
+
+				refreshHand();
+
 				nextActionButton.setText("Set Trump Card");
 				break;
 			}
 
 			case 2: {
 
-				actionIndex = 3;
+				actionIndex = 4;
 				if (gameplay.getCurrentRound() != gameplay.getMaxRound()) {
           setTrumpCard();
+          lastActionLabel.setText("Trump Card is set!");
           if (gameplay.getDealer().isUser() && gameplay.getTrumpCard().getCardValue() == "W") {
             // next state is now to choose trump color //
             nextActionButton.setText("Set Trump Color");
-            actionIndex = 9;
+            actionIndex = 3;
             break;
           }
         }
+				else {
+
+				  lastActionLabel.setText("This is the last round, so no Trump Card is set!");
+				  // set trump color to be NULL if this is the last round //
+				  setTrumpColor(CardColor.Colorless);
+				}
 
 				currentPlayer = gameplay.getRoundFirstPlayer();
 				nextActionButton.setText("Guess Tricks: " + currentPlayer.getName());
+				currentTrickWinnerLabel.setText(null);
 				if (currentPlayer.isUser()) {
 					tricksChoiceBox.setVisible(true);
 					tricksChoiceBox.getItems().addAll(getAvailableTrickGuesses(gameplay.getCurrentRound()));
@@ -135,23 +174,44 @@ public class GameController implements Initializable {
 				break;
 			}
 
-			case 3: {
+	     case 3: {
+	        showTrumpColorPanel();
+
+	        lastActionLabel.setText("Trump Color was chosen: " + gameplay.getTrumpColor().getColor());
+
+	        currentPlayer = gameplay.getRoundFirstPlayer();
+	        nextActionButton.setText("Guess Tricks: " + currentPlayer.getName());
+	        if (currentPlayer.isUser()) {
+	          tricksChoiceBox.setVisible(true);
+	          tricksChoiceBox.getItems().addAll(getAvailableTrickGuesses(gameplay.getCurrentRound()));
+	        }
+
+	        actionIndex = 4;
+
+	        break;
+	      }
+
+			case 4: {
 
 				// all players guess tricks, starting from the firstPLayer //
 
 				guessTricks(currentPlayer);
 
+
 				// if a null value was chosen, guess again //
 				if (nullValueChosen) {
+	        lastActionLabel.setText("Choose a valid guess!");
           break;
         }
+
+        lastActionLabel.setText("Player " + currentPlayer.getName() + " guessed " + currentPlayer.getTricksGuessed() + " tricks!");
 
 				// update current player //
 				currentPlayer = currentPlayer.getNextPlayer();
 				nextActionButton.setText("Guess Tricks: " + currentPlayer.getName());
 
 				if (currentPlayer == gameplay.getRoundFirstPlayer()) {
-					actionIndex = 4;
+					actionIndex = 5;
 					gameplay.initNewTrick();
 					nextActionButton.setText("Play Cards: " + currentPlayer.getName());
 					refreshHand(); // do this to change drag n drop functionality //
@@ -165,19 +225,23 @@ public class GameController implements Initializable {
 
 			}
 
-			case 4: {
-
-				currentTrickWinnerLabel.setText("Current Trick Winner: ");
+			case 5: {
 
 				playCard(currentPlayer);
 
+
 				if (currentPlayer.isUser() && !userPlayedCard) {
+	        lastActionLabel.setText("Play a valid card by dragging it to the center!");
+
           break;
         }
 
+				lastActionLabel.setText("Player " + currentPlayer.getName() + " played a card!");
+
 				gameplay.increaseCardsPlayed();
-				System.out.println(currentPlayer.getName() + " played Card ");
 				gameplay.updateTrickInfo(currentPlayer);
+        currentTrickWinnerLabel.setText("Trick Winner (Currently): " + gameplay.getTrickWinner().getName());
+
 				currentPlayer = currentPlayer.getNextPlayer();
 
 				// will play as many times as round; keep a counter //
@@ -185,7 +249,7 @@ public class GameController implements Initializable {
 
 				System.out.println("Cards Played: " + gameplay.getNumCardsPlayed());
 				if (gameplay.getNumCardsPlayed() == playersNum) {
-					actionIndex = 5;
+					actionIndex = 6;
 					nextActionButton.setText("Evaluate Trick");
 				}
 
@@ -195,24 +259,24 @@ public class GameController implements Initializable {
 				break;
 			}
 
-			case 5: {
+			case 6: {
 				// here we get the trick winner, then we go back to case 4 for the new round //
 
 				currentPlayer = gameplay.getTrickWinner();
-				System.out.println("Current Trick Winner is " + currentPlayer.getName());
-				currentTrickWinnerLabel.setText("Current Trick Winner: " + currentPlayer.getName());
+				lastActionLabel.setText("Current Trick Winner is " + currentPlayer.getName() + "!");
+				currentTrickWinnerLabel.setText("Trick Winner: " + currentPlayer.getName());
 				gameplay.increaseTricksPlayed();
 				currentPlayer.incrementTricksCompleted();
 				gameplay.initNewTrick();
 				userPlayedCard = false;
 				showPlayerInfoTop();
 
-				actionIndex = 6;
+				actionIndex = 7;
 				nextActionButton.setText("Go to Next Trick");
 
 				System.out.println("Tricks Played: " + gameplay.getNumTricksPlayed());
 				if (gameplay.getNumTricksPlayed() == gameplay.getCurrentRound()) {
-					actionIndex = 7;
+					actionIndex = 8;
 					nextActionButton.setText("Evaluate Round");
 				}
 
@@ -220,18 +284,22 @@ public class GameController implements Initializable {
 
 			}
 
-			case 6: {
+			case 7: {
 //				gameplay.updateScores();
 //				gameplay.resetHands();
 //				gameplay.resetTable();
 
+        lastActionLabel.setText("Starting new trick!");
+        System.out.println("Currenrt Player: " + currentPlayer.getName());
+        lastTrickWinnerLabel.setText("Last Trick Winner: " + currentPlayer.getName());
+
 				gameplay.resetLeadCard();
 
-				currentTrickWinnerLabel.setText("Current Trick Winner: ");
+//				currentTrickWinnerLabel.setText("Current Trick Winner: ");
 
 				showPlayerInfoTop();
 
-				actionIndex = 4;
+				actionIndex = 5;
 				refreshHand(); // do this to change drag n drop functionality //
 
 				resetVisualTrickInfo();
@@ -241,18 +309,22 @@ public class GameController implements Initializable {
 			}
 
 			// evaluate round //
-			case 7: {
+			case 8: {
+			  lastActionLabel.setText("Scores are updated!");
+        lastTrickWinnerLabel.setText(null);
+
 				gameplay.updateScores();
 				gameplay.resetHands();
 				gameplay.resetTable();
 
-				currentTrickWinnerLabel.setText("Current Trick Winner: ");
-
+				// show player info with bolded scores //
+				boldRoundScores = true;
 				showPlayerInfoTop();
 
 				if (gameplay.getCurrentRound() == gameplay.getMaxRound()) {
 					nextActionButton.setText("Congratulate Winner");
-					actionIndex = 8;
+					actionIndex = 9;
+					lastActionLabel.setText("Game is finished! Time to congratulate the Wizard!");
 				}
 				else {
 					actionIndex = 0;
@@ -262,24 +334,10 @@ public class GameController implements Initializable {
 				break;
 			}
 
-			case 8: {
+			case 9: {
+
 				congratulateWinner(e);
 				break;
-			}
-
-			case 9: {
-			  showTrumpColorPanel();
-
-			  currentPlayer = gameplay.getRoundFirstPlayer();
-        nextActionButton.setText("Guess Tricks: " + currentPlayer.getName());
-        if (currentPlayer.isUser()) {
-          tricksChoiceBox.setVisible(true);
-          tricksChoiceBox.getItems().addAll(getAvailableTrickGuesses(gameplay.getCurrentRound()));
-        }
-
-        actionIndex = 3;
-
-        break;
 			}
 
 		}
@@ -471,6 +529,7 @@ public class GameController implements Initializable {
 		ArrayList<Card> playerHandCards = gameplay.getPlayerHandCards(false); // do not order
 
 		showHand(playerHandCards);
+		calculateCardSpacing();
 	}
 
     public void dragCardOverCenter(DragEvent e) {
@@ -528,22 +587,16 @@ public class GameController implements Initializable {
 
 			ImageView cardImageView = getImageViewFromCard(card);
 
-			cardImageView.setFitHeight(50);
+			cardImageView.setFitHeight(80);
       cardImageView.setPreserveRatio(true);
-
-//      // if card is not playable, grey it out //
-//      // keep the code to insert a button for it //
-//      if (invalidCardsShown && card.isCardPlayable(gameplay.getLeadColor(), playableCardExists)) {
-//        ColorAdjust colorAdjustGrayscale = new ColorAdjust();
-//        colorAdjustGrayscale.setSaturation(-1);
-//        cardImageView.setEffect(colorAdjustGrayscale);
-//      }
+      cardImageView.setViewOrder(1);
 
       // lambda function to enlarge card when hovering over it //
       cardImageView.setOnMouseEntered(event -> {
 //	        	cardImageView.setFitHeight(70); // do not use, it changes the whole hbox //
       	cardImageView.setScaleX(1.5);
       	cardImageView.setScaleY(1.5);
+      	cardImageView.setViewOrder(0);
       });
 
       cardImageView.setOnMouseExited(event -> {
@@ -551,6 +604,7 @@ public class GameController implements Initializable {
 //	        	cardImageView.setFitHeight(70); // do not use, it changes the whole hbox //
       	cardImageView.setScaleX(1);
       	cardImageView.setScaleY(1);
+      	cardImageView.setViewOrder(1);
       });
 
       // can add the following statement to the below condition //
@@ -559,7 +613,7 @@ public class GameController implements Initializable {
         continue;
       }
 
-      if (currentPlayer == gameplay.getUser() && (actionIndex == 4) && (userPlayedCard == false)) {
+      if (currentPlayer == gameplay.getUser() && (actionIndex == 5) && (userPlayedCard == false)) {
         cardImageView.setOnDragDetected(event -> {
 
         	Dragboard db = cardImageView.startDragAndDrop(TransferMode.MOVE); // or none? //
@@ -581,6 +635,30 @@ public class GameController implements Initializable {
 			player1Box.getChildren().add(cardImageView);
 
 		}
+	}
+
+	void calculateCardSpacing() {
+
+	  int cardCount = player1Box.getChildren().size();
+
+	  if (cardCount < 2) {
+	    player1Box.setSpacing(10);
+	    return;
+	  }
+
+	  double availableWidth = myBorderPane.getWidth() - 40; // subtract a little from the sides //
+
+	  Node firstCard = player1Box.getChildren().get(0);
+
+	  double cardWidth = firstCard.getLayoutBounds().getWidth();
+
+	  double totalWidthOfCards = cardWidth * cardCount;
+
+	  double requiredSpacing = (availableWidth - totalWidthOfCards) / (cardCount - 1);
+
+	  double finalSpacing = Math.min(requiredSpacing, 10);
+
+	  player1Box.setSpacing(finalSpacing);
 	}
 
 	public void setDraggedCard(Card card) {
@@ -610,6 +688,10 @@ public class GameController implements Initializable {
 
         cardWrapper.getChildren().addAll(cardImageView, playerNameLabel);
 
+        cardWrapper.setMaxWidth(cardImageView.getLayoutBounds().getWidth() + 10);
+        cardWrapper.setMinWidth(cardImageView.getLayoutBounds().getWidth() + 10);
+
+
 		centerCards.getChildren().add(cardWrapper);
 		if (player.isUser()) {
       refreshHand();
@@ -623,7 +705,7 @@ public class GameController implements Initializable {
 		Card trumpCard = gameplay.getTrumpCard();
 		ImageView cardImageView = getImageViewFromCard(trumpCard);
 
-		cardImageView.setFitHeight(80);
+		cardImageView.setFitHeight(100);
         cardImageView.setPreserveRatio(true);
 
 		trumpCardBox.getChildren().add(cardImageView);
@@ -631,6 +713,10 @@ public class GameController implements Initializable {
 		// set the color //
 		setTrumpColor(trumpCard);
 
+	}
+
+	public void setTrumpColor(CardColor color) {
+	  gameplay.setTrumpColor(color);
 	}
 
 	public void setTrumpColor(Card trumpCard) {
@@ -768,17 +854,25 @@ public class GameController implements Initializable {
 		for (int i = 0; i < playersNum; i++) {
 			VBox playerInfoVBox = new VBox();
 			playerInfoVBox.getStyleClass().add("playerInfoStyle");
-			playerInfoVBox.setMaxWidth(200); // arbitrary //
+//			playerInfoVBox.setMinWidth(myBorderPane.getWidth() / playersNum); // arbitrary //
+			playerInfoVBox.setMaxWidth(250);
 
-//			centerCards.setHgrow(playerInfoVBox, Priority.ALWAYS);
+			topPlayerInfoBox.setHgrow(playerInfoVBox, Priority.ALWAYS);
+
+			playerInfoVBox.setSpacing(5);
 
 			Label nameLabel = new Label(players[i].getName());
-			Label scoreLabel = new Label("Score: " + players[i].getScore() + " | " + players[i].getRoundScore(gameplay.getCurrentRound() - 1));
-			Label tricksGuessedLabel = new Label("Guessed:");
-			Label tricksGuessedLabel2 = new Label(players[i].getTricksGuessed() + " Tricks");
-			Label tricksCompletedLabel = new Label("Completed:");
-			Label tricksCompletedLabel2 = new Label(players[i].getTricksCompleted() + " Tricks");
-			playerInfoVBox.getChildren().addAll(nameLabel, scoreLabel, tricksGuessedLabel, tricksGuessedLabel2, tricksCompletedLabel, tricksCompletedLabel2);
+			Label roundScoreLabel = new Label("Round Score: " + players[i].getRoundScore(gameplay.getCurrentRound() - 1));
+			Label totalScoreLabel = new Label("Total Score: " + players[i].getScore());
+			Label tricksGuessedLabel = new Label("Tricks Guessed: " + players[i].getTricksGuessed());
+      Label tricksCompletedLabel = new Label("Tricks Completed: " + players[i].getTricksCompleted());
+
+      if (boldRoundScores == true) {
+        roundScoreLabel.setFont(Font.font(roundScoreLabel.getFont().getFamily(), FontWeight.BOLD, roundScoreLabel.getFont().getSize()));
+        totalScoreLabel.setFont(Font.font(totalScoreLabel.getFont().getFamily(), FontWeight.BOLD, totalScoreLabel.getFont().getSize()));
+      }
+
+			playerInfoVBox.getChildren().addAll(nameLabel, roundScoreLabel, totalScoreLabel, tricksGuessedLabel, tricksCompletedLabel);
 			topPlayerInfoBox.getChildren().add(playerInfoVBox);
 		}
 

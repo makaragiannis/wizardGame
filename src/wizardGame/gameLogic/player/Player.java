@@ -60,6 +60,10 @@ public abstract class Player {
 	}
 
 	public String getName() {
+
+	  if (name == null) {
+      return "";
+    }
 		return name;
 	}
 

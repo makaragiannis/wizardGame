@@ -57,16 +57,17 @@ public class Controller {
 
 		playersNum = getPlayersNum();
 
-		// to start new game, no text field must be name //
-		if (player1Name.getText().length() == 0 ||
-			player2Name.getText().length() == 0 ||
-			player3Name.getText().length() == 0 ||
-			(playersNum > 3 && player4Name.getText().length() == 0) ||
-			(playersNum > 4 && player5Name.getText().length() == 0) ||
-			(playersNum == 6 && player6Name.getText().length() == 0)) {
+		// to start new game, no text field must be empty //
+		// also no text field must be longer than 15 chars //
+		if (player1Name.getText().length() == 0 || player1Name.getText().length() > 15 ||
+			player2Name.getText().length() == 0 || player2Name.getText().length() > 15 ||
+			player3Name.getText().length() == 0 || player3Name.getText().length() > 15 ||
+			(playersNum > 3 && (player4Name.getText().length() == 0 || player4Name.getText().length() > 15)) ||
+			(playersNum > 4 && (player5Name.getText().length() == 0 || player5Name.getText().length() > 15)) ||
+			(playersNum == 6 && (player6Name.getText().length() == 0 || player6Name.getText().length() > 15))) {
 
 			// this must be a pop up error //
-				System.out.println("Error! No Name field must be empty!");
+				System.out.println("Error! All names must be 1-15 letters long!");
 				return;
 		}
 		CPUNames = new ArrayList<>();
@@ -86,7 +87,17 @@ public class Controller {
 
 	    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 	    stage.setScene(new Scene(root));
+
 	    stage.setResizable(true);
+
+	    // the width and height calculated based on the pane restriction will be the minimum //
+	    // this accounts for the extra spacing added by the menu //
+
+	    stage.setMinWidth(stage.getWidth());
+	    stage.setMinHeight(stage.getHeight());
+//	    stage.setWidth(800);
+//	    stage.setHeight(700);
+
 	    stage.show();
 
 	    gameController.initGame(playersNum, player1NameString, CPUNames);

@@ -167,76 +167,6 @@ public class Gameplay {
     return false;
   }
 
-	public void playRound(Scanner scanner) {
-
-		CardColor trumpColor;
-		Player trumpColorChooser;
-
-		System.out.println("Proceed to next round? ");
-
-		scanner.nextLine();
-
-		round++;
-		System.out.printf("Round %d: \n", round);
-		shuffleCards();
-
-		dealCards();
-
-		System.out.println("Your hand is: ");
-		players[0].printHand();
-
-		if (round != maxRound) {
-			table.setTrumpCard(getNextCard());
-			System.out.print("Trump Card is: " );
-			table.printTrumpCard();
-
-			if (table.getTrumpCard().getCardValue() == "W") {
-				trumpColor = getDealer().determineTrumpColor(scanner);
-				table.setTrumpColor(trumpColor);
-
-				System.out.printf("Color %s was chosen as trump color by %s\n", trumpColor.getColor(), getDealer().getName());
-			}
-		}
-
-		int trickWinner;
-		int tricksGuessed[] = getTricksGuessed();
-		int winner = firstPlayer; // when the round starts, the first player is the round first player //
-
-		for (int i = 0; i < round; i++) {
-
-//			System.out.println("DEBUG: Player 1 hand is");
-//			players[1].printHand(round);
-//			System.out.println("DEBUG: Player 2 hand is");
-//			players[2].printHand(round);
-//			System.out.println("DEBUG: Player 3 hand is");
-//			players[3].printHand(round);
-
-			System.out.println("Your hand is: ");
-			players[0].printHand();
-
-			trickWinner = playCards(firstPlayer);
-			firstPlayer = trickWinner;
-			players[trickWinner].incrementTricksCompleted();
-
-			System.out.println("Trick winner: " + players[trickWinner].getName());
-
-			table.resetLeadCard();
-
-		}
-
-//		printTotalTricksGuessed();
-		updateScores();
-		printScores();
-
-		printScoresPerRound();
-
-		resetHands();
-		table.resetTable();
-
-
-		incrementFirstPlayer();
-
-	}
 
 	public void incrementFirstPlayer() {
 		firstPlayer++; // the players who play first at each round rotate //
@@ -279,6 +209,10 @@ public class Gameplay {
 		return table.getTrumpCard();
 	}
 
+	public CardColor getTrumpColor() {
+	  return table.getTrumpColor();
+	}
+
 	public int getCurrentRound() {
 		return this.round;
 	}
@@ -313,49 +247,6 @@ public class Gameplay {
 
 	public ArrayList<Assumption> getAssumptions() {
 	  return table.getAssumptions();
-	}
-
-
-	int playCards(int firstPlayer) {
-
-		// winner plays first //
-
-		int currentPlayer = 0;
-		int currentWinner = -1; // initialize to an invalid value //
-		int trickWinner;
-		int currentMaxCardScore = -1; // initialize to an invalid value //
-		int cardScore;
-		Card lastPlayedCard;
-		CardColor trumpColor;
-		CardColor leadColor;
-
-		for (int i = 0; i < playerNum; i++) {
-
-			currentPlayer = (firstPlayer + i) % playerNum;
-
-//			players[currentPlayer].playCard(table) // is required, commented out cause of change //
-			lastPlayedCard = players[currentPlayer].getLastPlayedCard();
-
-			System.out.printf("%s played card: ", players[currentPlayer].getName());
-			lastPlayedCard.printCard();
-
-			trumpColor = table.getTrumpColor();
-			leadColor = table.getLeadColor();
-			if ((leadColor == null) || (leadColor == CardColor.Colorless)) {
-				leadColor = lastPlayedCard.getCardColor();
-			}
-
-			cardScore = lastPlayedCard.getCardScore(trumpColor, leadColor);
-
-			if (cardScore > currentMaxCardScore) {
-				currentMaxCardScore = cardScore;
-				currentWinner = currentPlayer;
-			}
-
-		}
-
-		trickWinner = currentWinner;
-		return trickWinner;
 	}
 
 	public void updateTrickInfo(Player currentPlayer) {
