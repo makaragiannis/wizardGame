@@ -1,5 +1,5 @@
 #centerCards {
-    -fx-border-color: #FF0000;
+    -fx-border-color: #000000;
     -fx-border-width: 4px;
     -fx-border-radius: 15px;
     -fx-background-color: #7F7F7F;
@@ -10,7 +10,7 @@
 }
 
 #trumpCardBox {
-    -fx-border-color: #FF0000;
+    -fx-border-color: #000000;
     -fx-border-width: 4px;
     -fx-border-radius: 15px;
     -fx-background-color: #7F7F7F;
@@ -32,3 +32,5 @@
     -fx-spacing: 5px;                /* Space between Name and Score */
     
 }
+
+.

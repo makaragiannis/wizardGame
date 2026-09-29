@@ -66,7 +66,6 @@ public class GameController implements Initializable {
 
 	private Boolean nullValueChosen = false;
 	private Boolean userPlayedCard = false;
-	private Boolean boldRoundScores = false;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -121,8 +120,7 @@ public class GameController implements Initializable {
 				resetVisualTrumpCardInfo();
 				resetVisualTrickInfo();
 
-        boldRoundScores = false;
-        showPlayerInfoTop();
+        showPlayerInfoTop(null, 0);
 
 				gameplay.shuffleCards();
 				dealerLabel.setText("Dealer: " + gameplay.getDealer().getName());
@@ -196,7 +194,7 @@ public class GameController implements Initializable {
 				// all players guess tricks, starting from the firstPLayer //
 
 				guessTricks(currentPlayer);
-
+        showPlayerInfoTop(null, 0);
 
 				// if a null value was chosen, guess again //
 				if (nullValueChosen) {
@@ -205,6 +203,8 @@ public class GameController implements Initializable {
         }
 
         lastActionLabel.setText("Player " + currentPlayer.getName() + " guessed " + currentPlayer.getTricksGuessed() + " tricks!");
+
+        showPlayerInfoTop(currentPlayer, 2);
 
 				// update current player //
 				currentPlayer = currentPlayer.getNextPlayer();
@@ -226,6 +226,8 @@ public class GameController implements Initializable {
 			}
 
 			case 5: {
+
+			  showPlayerInfoTop(null, 0);
 
 				playCard(currentPlayer);
 
@@ -269,7 +271,7 @@ public class GameController implements Initializable {
 				currentPlayer.incrementTricksCompleted();
 				gameplay.initNewTrick();
 				userPlayedCard = false;
-				showPlayerInfoTop();
+				showPlayerInfoTop(currentPlayer, 3);
 
 				actionIndex = 7;
 				nextActionButton.setText("Go to Next Trick");
@@ -297,7 +299,7 @@ public class GameController implements Initializable {
 
 //				currentTrickWinnerLabel.setText("Current Trick Winner: ");
 
-				showPlayerInfoTop();
+				showPlayerInfoTop(null, 0);
 
 				actionIndex = 5;
 				refreshHand(); // do this to change drag n drop functionality //
@@ -312,19 +314,19 @@ public class GameController implements Initializable {
 			case 8: {
 			  lastActionLabel.setText("Scores are updated!");
         lastTrickWinnerLabel.setText(null);
+        currentTrickWinnerLabel.setText(null);
 
 				gameplay.updateScores();
 				gameplay.resetHands();
 				gameplay.resetTable();
 
 				// show player info with bolded scores //
-				boldRoundScores = true;
-				showPlayerInfoTop();
+				showPlayerInfoTop(null, 1);
 
 				if (gameplay.getCurrentRound() == gameplay.getMaxRound()) {
 					nextActionButton.setText("Congratulate Winner");
 					actionIndex = 9;
-					lastActionLabel.setText("Game is finished! Time to congratulate the Wizard!");
+					lastActionLabel.setText("Congratulare the Winner!");
 				}
 				else {
 					actionIndex = 0;
@@ -356,20 +358,22 @@ public class GameController implements Initializable {
 
 	void resetVisualTrickInfo() {
 		centerCards.getChildren().clear();
+		centerCards.setStyle("-fx-border-color: #000000;");
 
 		leadColorLabel.setTextFill(Color.BLACK);
 		leadColorLabel.setText("Lead Color");
 
-		showPlayerInfoTop();
+//		showPlayerInfoTop(null, 0);
 	}
 
 	void resetVisualTrumpCardInfo() {
 		trumpCardBox.getChildren().clear();
+		trumpCardBox.setStyle("-fx-border-color: #000000;");
 
 		trumpColorLabel.setTextFill(Color.BLACK);
 		trumpColorLabel.setText("Trump Color");
 
-		showPlayerInfoTop();
+//		showPlayerInfoTop(null, 0);
 	}
 
 	void guessTricks(Player player) {
@@ -387,7 +391,7 @@ public class GameController implements Initializable {
 		}
 
 
-		showPlayerInfoTop();
+//		showPlayerInfoTop();
 	}
 
 	public void showPlayedCards(ActionEvent e) throws IOException {
@@ -474,9 +478,9 @@ public class GameController implements Initializable {
     }
 
 		Color leadColor = cardColorToColor(gameplay.getLeadColor());
-		if (leadColor != null) {
-			leadColorLabel.setTextFill(leadColor);
-		}
+//		if (leadColor != null) {
+			applyLeadColor(leadColor);
+//		}
 	}
 
 	public Integer guessTricksUser() {
@@ -728,7 +732,7 @@ public class GameController implements Initializable {
 
 		// if color is not colorless, set it and return //
 		if (color != null) {
-			trumpColorLabel.setTextFill(color);
+			applyTrumpColor(color, null);
 			return;
 		}
 
@@ -740,14 +744,16 @@ public class GameController implements Initializable {
 			cardColor = colorToCardColor(color);
 
 	     if (color != null) {
-        trumpColorLabel.setTextFill(color);
+        applyTrumpColor(color, gameplay.getDealer());
+
        }
 		}
 		else if (trumpCard.getCardValue() == "J") {
 			// if card is J, there is no trump color //
 //      trumpColorLabel.setText("Trump Color: None");
 //      trumpColorLabel.setTextAlignment(TextAlignment.CENTER);
-			trumpColorLabel.setText("No Trump Color");
+//			trumpColorLabel.setText("No Trump Color");
+		  applyTrumpColor(null, null);
 		}
 
 		if (cardColor != null) {
@@ -760,6 +766,67 @@ public class GameController implements Initializable {
 		gameplay.setTrumpColor(cardColor);
 
 	}
+
+	public void applyTrumpColor(Color trumpColor, Player dealer) {
+//	  trumpColorLabel.setTextFill(trumpColor);
+
+
+	  // paint the box //
+    if (trumpColor == Color.RED) {
+      trumpCardBox.setStyle("-fx-border-color: #FF0000;");
+      trumpColorLabel.setText("Trump Color: Red");
+     }
+    else if (trumpColor == Color.YELLOW) {
+       trumpCardBox.setStyle("-fx-border-color: #FFFF00;");
+       trumpColorLabel.setText("Trump Color: Yellow");
+     }
+    else if (trumpColor == Color.BLUE) {
+       trumpCardBox.setStyle("-fx-border-color: #0000FF;");
+       trumpColorLabel.setText("Trump Color: Blue");
+     }
+    else if (trumpColor == Color.GREEN) {
+       trumpCardBox.setStyle("-fx-border-color: #00FF00;");
+       trumpColorLabel.setText("Trump Color: Green");
+     }
+   else { // color is null //
+     trumpCardBox.setStyle("-fx-border-color: #000000;");
+     trumpColorLabel.setText("No Trump Color");
+   }
+
+    if (dealer != null) {
+      trumpColorLabel.setText(trumpColorLabel.getText() + " (Chosen by Dealer)");
+    }
+
+
+	}
+
+	 public void applyLeadColor(Color leadColor) {
+//	    leadColorLabel.setTextFill(leadColor);
+
+	    // paint the box //
+	    if (leadColor == Color.RED) {
+	      centerCards.setStyle("-fx-border-color: #FF0000;");
+	      leadColorLabel.setText("Lead Color: Red");
+	     }
+	    else if (leadColor == Color.YELLOW) {
+	       centerCards.setStyle("-fx-border-color: #FFFF00;");
+	       leadColorLabel.setText("Lead Color: Yellow");
+	     }
+	    else if (leadColor == Color.BLUE) {
+	       centerCards.setStyle("-fx-border-color: #0000FF;");
+	       leadColorLabel.setText("Lead Color: Blue");
+	     }
+	    else if (leadColor == Color.GREEN) {
+	       centerCards.setStyle("-fx-border-color: #00FF00;");
+	       leadColorLabel.setText("Lead Color: Green");
+	     }
+	   else {
+	     centerCards.setStyle("-fx-border-color: #000000;");
+	     leadColorLabel.setText("No Lead Color");
+	   }
+
+
+	  }
 
 	public Color chooseTrumpColor() {
 
@@ -795,9 +862,9 @@ public class GameController implements Initializable {
 
     System.out.println("Trump Color set to " + trumpColor.getColor());
 
-    trumpColorLabel.setText("Trump Color\n(Chosen by " + gameplay.getDealer().getName() + ")");
+//    trumpColorLabel.setText("Trump Color\n(Chosen by " + gameplay.getDealer().getName() + ")");
     trumpColorLabel.setTextAlignment(TextAlignment.CENTER);
-    trumpColorLabel.setTextFill(cardColorToColor(trumpColor));
+    applyTrumpColor(cardColorToColor(trumpColor), gameplay.getDealer());
 
     gameplay.setTrumpColor(trumpColor);
 	}
@@ -841,7 +908,7 @@ public class GameController implements Initializable {
 		return availableTrickGuesses;
 	}
 
-	public void showPlayerInfoTop() {
+	public void showPlayerInfoTop(Player boldPlayer, int boldMode) {
 
 		topPlayerInfoBox.getChildren().clear();
 
@@ -867,9 +934,18 @@ public class GameController implements Initializable {
 			Label tricksGuessedLabel = new Label("Tricks Guessed: " + players[i].getTricksGuessed());
       Label tricksCompletedLabel = new Label("Tricks Completed: " + players[i].getTricksCompleted());
 
-      if (boldRoundScores == true) {
+      if (boldMode == 1) {
         roundScoreLabel.setFont(Font.font(roundScoreLabel.getFont().getFamily(), FontWeight.BOLD, roundScoreLabel.getFont().getSize()));
         totalScoreLabel.setFont(Font.font(totalScoreLabel.getFont().getFamily(), FontWeight.BOLD, totalScoreLabel.getFont().getSize()));
+      }
+
+      if (players[i] == boldPlayer) {
+        if (boldMode == 2) {
+          tricksGuessedLabel.setFont(Font.font(tricksGuessedLabel.getFont().getFamily(), FontWeight.BOLD, tricksGuessedLabel.getFont().getSize()));
+        }
+        else if (boldMode == 3) {
+          tricksCompletedLabel.setFont(Font.font(tricksCompletedLabel.getFont().getFamily(), FontWeight.BOLD, tricksCompletedLabel.getFont().getSize()));
+        }
       }
 
 			playerInfoVBox.getChildren().addAll(nameLabel, roundScoreLabel, totalScoreLabel, tricksGuessedLabel, tricksCompletedLabel);

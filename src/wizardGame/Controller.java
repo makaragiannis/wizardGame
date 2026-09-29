@@ -133,6 +133,15 @@ public class Controller {
 		Parent root = FXMLLoader.load(getClass().getResource("selections.fxml"));
 		stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
 		scene = new Scene(root);
+
+    stage.setResizable(true);
+
+    // the width and height calculated based on the pane restriction will be the minimum //
+    // this accounts for the extra spacing added by the menu //
+
+    stage.setMinWidth(stage.getWidth());
+    stage.setMinHeight(stage.getHeight());
+
 		stage.setScene(scene);
 		stage.show();
 
@@ -142,6 +151,15 @@ public class Controller {
 		Parent root = FXMLLoader.load(getClass().getResource("game.fxml"));
 		stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
 		scene = new Scene(root);
+
+    stage.setResizable(true);
+
+    // the width and height calculated based on the pane restriction will be the minimum //
+    // this accounts for the extra spacing added by the menu //
+
+    stage.setMinWidth(stage.getWidth());
+    stage.setMinHeight(stage.getHeight());
+
 		stage.setScene(scene);
 		stage.show();
 
